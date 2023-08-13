@@ -1,21 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import Logo from "./Logo";
-import {
-  Anchor,
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Group,
-  Modal,
-  PasswordInput,
-  TextInput,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Anchor, Button, Divider, Flex, Group, Modal } from "@mantine/core";
+import SignIn from "./forms/SignIn";
+import SignUp from "./forms/SignUp";
 
 const Header = () => {
-  const [opened, { open, close }] = useDisclosure(false);
-
+  const [signInOpened, setSignInOpened] = useState(false);
+  const [signUpOpened, setSignUpOpened] = useState(false);
   return (
     <header>
       <Flex align="center" justify="space-between">
@@ -34,19 +25,34 @@ const Header = () => {
           </Anchor>
         </Group>
         <Group>
-          <Button variant="outline" color="dark" onClick={open}>
+          <Button
+            variant="outline"
+            color="dark"
+            onClick={() => setSignInOpened(true)}
+          >
             SIGN IN
           </Button>
-          <Button color="violet">SIGN UP</Button>
+          <Button color="violet" onClick={() => setSignUpOpened(true)}>
+            SIGN UP
+          </Button>
         </Group>
       </Flex>
       <Divider />
-      <Modal opened={opened} onClose={close} centered>
-        <Box>
-          <TextInput label="E-mail" placeholder="Your name" mb={20} />
-          <PasswordInput label="Password" placeholder="Your password" />
-        </Box>
-        {/* Modal content */}
+      <Modal
+        opened={signInOpened}
+        onClose={() => setSignInOpened(false)}
+        title="Please sign in!"
+        centered
+      >
+        <SignIn />
+      </Modal>
+      <Modal
+        opened={signUpOpened}
+        onClose={() => setSignUpOpened(false)}
+        title="Sign up!"
+        centered
+      >
+        <SignUp />
       </Modal>
     </header>
   );
