@@ -11,6 +11,7 @@ import {
   Flex,
   Grid,
   Image,
+  LoadingOverlay,
   Modal,
   Pagination,
   Table,
@@ -34,30 +35,60 @@ export default function Home() {
 
   const [iconGrid, setIconGrid] = useState(true);
   const [iconList, setIconList] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [minLoad, setMinLoad] = useState(0);
+  const [maxLoad, setMaxLoad] = useState(9);
+  const [vehicleCount, setVehicleCount] = useState(null);
 
   const getVehicleMake = async () => {
-    const { data } = await supabase.from("vehicle_make").select();
+    setLoading(true);
+    const { data, count } = await supabase
+      .from("vehicle_make")
+      .select("*", { count: "exact" })
+      .range(minLoad, maxLoad);
     if (data) {
       setVehicleMake(data);
+      setVehicleCount(count);
     } else console.log("Error");
+    setLoading(false);
   };
 
   const getVehicleModel = async () => {
-    const { data } = await supabase.from("vehicle_model").select();
+    setLoading(true);
+    const { data } = await supabase
+      .from("vehicle_model")
+      .select("*", { count: "exact" })
+      .range(minLoad, maxLoad);
     if (data) {
       setVehicleModel(data);
     } else console.log("Error");
+    setLoading(false);
   };
 
   useEffect(() => {
     getVehicleMake();
     getVehicleModel();
-  }, []);
+  }, [minLoad, maxLoad]);
 
   const removeVehicle = async (index, id) => {
+    setLoading(true);
     const { data } = await supabase.from("vehicle_make").delete().eq("id", id);
     if (data) {
       console.log(index, id);
+    }
+    setLoading(false);
+  };
+
+  const changePage = (prevPage) => {
+    if (activePage > prevPage) {
+      setPage((prevPage) => prevPage - 1);
+      setMinLoad((prevIndex) => prevIndex - 10),
+        setMaxLoad((prevIndex) => prevIndex - 10);
+    } else {
+      setPage((prevPage) => prevPage + 1),
+        setMinLoad((prevIndex) => prevIndex + 10),
+        setMaxLoad((prevIndex) => prevIndex + 10);
     }
   };
 
@@ -112,6 +143,8 @@ export default function Home() {
       );
   });
 
+  console.log(loading);
+
   return (
     <>
       <Header />
@@ -152,7 +185,9 @@ export default function Home() {
         </ActionIcon>
       </Flex>
 
-      {iconGrid ? (
+      {loading ? (
+        <LoadingOverlay visible={loading} loaderProps={{ color: "violet" }} />
+      ) : iconGrid ? (
         <Grid my={20} ml={20} cols={5}>
           {vehicles}
         </Grid>
@@ -166,8 +201,8 @@ export default function Home() {
         <Divider my={20} w={400} />
         <Pagination
           value={activePage}
-          onChange={setPage}
-          total={5}
+          onChange={changePage}
+          total={Math.floor(vehicleCount / 10 + 1)}
           color="violet"
         />
       </Flex>
