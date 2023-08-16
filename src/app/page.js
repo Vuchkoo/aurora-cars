@@ -6,7 +6,6 @@ import CreateVehicle from "@/components/forms/CreateVehicle";
 import {
   ActionIcon,
   Button,
-  Card,
   Center,
   Divider,
   Flex,
@@ -14,19 +13,27 @@ import {
   Image,
   Modal,
   Pagination,
-  Paper,
-  SimpleGrid,
+  Table,
   Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconX } from "@tabler/icons-react";
+import {
+  IconLayoutGrid,
+  IconLayoutList,
+  IconPencil,
+  IconX,
+} from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [opened, { open, close }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
+
   const [vehicleMake, setVehicleMake] = useState([]);
   const [vehicleModel, setVehicleModel] = useState([]);
+
+  const [iconGrid, setIconGrid] = useState(true);
+  const [iconList, setIconList] = useState(false);
 
   const getVehicleMake = async () => {
     const { data } = await supabase.from("vehicle_make").select();
@@ -48,80 +55,122 @@ export default function Home() {
   }, []);
 
   const removeVehicle = async (index, id) => {
-    console.log(index, id);
-    // const {data} = await supabase.from('vehicle_make').delete().eq('id', id)
+    const { data } = await supabase.from("vehicle_make").delete().eq("id", id);
+    if (data) {
+      console.log(index, id);
+    }
   };
 
   const vehicles = vehicleMake?.map((item, index) => {
     const model = vehicleModel[index];
     console.log(model);
-    return <VehicleCard data={item} model={model} key={index} index={index} />;
-    // return (
-    //   <Card withBorder radius="md" w={300}>
-    //     <Paper>
-    //       <Flex justify="flex-end">
-    //         <ActionIcon onClick={() => removeVehicle(index, item.id)}>
-    //           <IconX />
-    //         </ActionIcon>
-    //       </Flex>
-    //       <Center>
-    //         {" "}
-    //         <Image
-    //           src="https://i.imgur.com/ZL52Q2D.png"
-    //           alt="Tesla Model S"
-    //           width={200}
-    //           height={200}
-    //           fit="scale-down"
-    //         />
-    //       </Center>
-    //       <Center>
-    //         <Text fw={500}>
-    //           {item.name} <span>{model.name}</span>
-    //         </Text>
-    //       </Center>
-    //   <Center my={20}>
-    //   <Button variant="outline" color="violet" size="xs">
-    //     Edit
-    //   </Button>
-    // </Center>
-    //     </Paper>
-    //   </Card>
-    // );
+    if (iconGrid)
+      return (
+        <VehicleCard
+          data={item}
+          model={model}
+          key={index}
+          index={index}
+          removeVehicle={removeVehicle}
+        />
+      );
+    else
+      return (
+        <tr key={index}>
+          <td>
+            <Image
+              src="https://i.imgur.com/ZL52Q2D.png"
+              alt="Tesla Model S"
+              width={100}
+              height={100}
+              fit="scale-down"
+            />
+          </td>
+
+          <td width="100%">
+            <Center>
+              <Text fw={500}>
+                {item.name} <span>{model.name}</span>
+              </Text>
+            </Center>
+          </td>
+
+          <td>
+            <Flex>
+              <ActionIcon color="violet" variant="light">
+                <IconPencil />
+              </ActionIcon>
+              <ActionIcon
+                color="violet"
+                onClick={() => removeVehicle(index, item.id)}
+              >
+                <IconX />
+              </ActionIcon>
+            </Flex>
+          </td>
+        </tr>
+      );
   });
 
   return (
     <>
       <Header />
 
-      <Center my={20}>
+      <Flex justify="center" align="center" direction="column" my={20}>
         <Button color="violet" onClick={open}>
           Create a new vehicle
         </Button>
-      </Center>
+        <Divider my={20} w={400} />
+      </Flex>
 
       <Modal opened={opened} onClose={close} title="Vehicle Creation">
         <CreateVehicle close={close} />
       </Modal>
 
-      <Divider />
+      <Flex ml={20}>
+        <ActionIcon
+          variant={iconGrid ? "light" : "transparent"}
+          color={iconGrid ? "violet" : "gray"}
+          mr={10}
+          onClick={() => {
+            setIconGrid(true);
+            setIconList(false);
+          }}
+        >
+          <IconLayoutGrid />
+        </ActionIcon>
+        <ActionIcon
+          variant={iconList ? "light" : "transparent"}
+          color={iconList ? "violet" : "gray"}
+          mr={10}
+          onClick={() => {
+            setIconList(true);
+            setIconGrid(false);
+          }}
+        >
+          <IconLayoutList />
+        </ActionIcon>
+      </Flex>
 
-      <SimpleGrid mt={20} ml={20} cols={5}>
-        {/* {vehicleMake.map((vehicle, index) => {
-          return <VehicleCard data={vehicleMake} key={index} />;
-        })} */}
-        {vehicles}
-      </SimpleGrid>
+      {iconGrid ? (
+        <Grid my={20} ml={20} cols={5}>
+          {vehicles}
+        </Grid>
+      ) : (
+        <Table highlightOnHover w="100%" striped>
+          <tbody>{vehicles}</tbody>
+        </Table>
+      )}
 
-      <Divider my={20} />
-
-      <Center>
+      <Flex justify="center" align="center" direction="column">
+        <Divider my={20} w={400} />
         <Pagination
           value={activePage}
           onChange={setPage}
           total={5}
           color="violet"
         />
-      </Center>
+      </Flex>
     </>
   );
 }
