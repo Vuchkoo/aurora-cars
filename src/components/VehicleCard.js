@@ -1,32 +1,19 @@
-import { supabase } from "@/common/config/Supabase";
 import {
   ActionIcon,
-  Badge,
   Button,
   Card,
   Center,
   Flex,
-  Group,
   Image,
   Text,
-  createStyles,
-  rem,
 } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import React from "react";
 
-function VehicleCard({ data, model, index }) {
-  const removeVehicle = async (index, id) => {
-    // console.log(index, id);
-    const { data } = await supabase.from("vehicle_make").delete().eq("id", id);
-    if (data) {
-      console.log(index, id);
-    }
-  };
-
+function VehicleCard({ data, model, index, removeVehicle }) {
   return (
     <>
-      <Card withBorder radius="md" w={300}>
+      <Card withBorder radius="md" w={300} mr={20} mb={20}>
         <Card.Section withBorder>
           <Flex justify="flex-end">
             <ActionIcon onClick={() => removeVehicle(index, data.id)}>

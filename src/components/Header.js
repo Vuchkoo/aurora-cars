@@ -20,9 +20,6 @@ const Header = () => {
           <Anchor underline={false} color="dark">
             Cars
           </Anchor>
-          <Anchor underline={false} color="dark">
-            Rent
-          </Anchor>
         </Group>
         <Group>
           <Button
