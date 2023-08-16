@@ -45,13 +45,12 @@ function CreateVehicle({ close }) {
     setActiveStep((current) => (current < 2 ? current + 1 : current));
   };
 
-  const prevStep = () =>
-    setActiveStep((current) => (current > 0 ? current - 1 : current));
-
   const createNewModel = async () => {
     const { data, error } = await supabase
       .from("vehicle_model")
-      .upsert({ ...vehicleModelForm.values });
+      .upsert({ ...vehicleModelForm.values })
+      .select()
+      .single();
     if (error) {
       console.log("Error");
     } else console.log(data);
