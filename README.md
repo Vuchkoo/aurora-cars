@@ -1,1 +1,1 @@
-Test project about car dealership
+Test Project - Aurora Cars Database
