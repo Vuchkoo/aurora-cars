@@ -143,8 +143,6 @@ export default function Home() {
       );
   });
 
-  console.log(loading);
-
   return (
     <>
       <Header />
@@ -188,9 +186,11 @@ export default function Home() {
       {loading ? (
         <LoadingOverlay visible={loading} loaderProps={{ color: "violet" }} />
       ) : iconGrid ? (
-        <Grid my={20} ml={20} cols={5}>
-          {vehicles}
-        </Grid>
+        <Center>
+          <Grid my={20} ml={20} cols={5} justify="center">
+            {vehicles}
+          </Grid>
+        </Center>
       ) : (
         <Table highlightOnHover w="100%" striped>
           <tbody>{vehicles}</tbody>
