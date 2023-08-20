@@ -9,7 +9,7 @@ const Header = () => {
   const [signUpOpened, setSignUpOpened] = useState(false);
   return (
     <header>
-      <Flex align="center" justify="space-between">
+      <Flex align="center" justify="space-between" mx={20} my={5}>
         <Group>
           <Logo />
         </Group>
@@ -34,7 +34,7 @@ const Header = () => {
           </Button>
         </Group>
       </Flex>
-      <Divider />
+      <Divider color="violet" />
       <Modal
         opened={signInOpened}
         onClose={() => setSignInOpened(false)}

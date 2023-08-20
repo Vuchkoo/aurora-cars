@@ -10,7 +10,7 @@ import {
 import { IconX } from "@tabler/icons-react";
 import React from "react";
 
-function VehicleCard({ data, model, index, removeVehicle }) {
+function VehicleCard({ data, model, index, removeVehicle, open }) {
   return (
     <>
       <Card withBorder radius="md" w={300} mr={20} mb={20}>
@@ -32,16 +32,15 @@ function VehicleCard({ data, model, index, removeVehicle }) {
         </Card.Section>
 
         <Card.Section>
-          <Center mt="md">
-            <Text fw={500}>
-              {data?.name} <span>{model?.name}</span>
-            </Text>
-          </Center>
+          <Flex direction="column" align="center" mt={20}>
+            <Text fw={500}>{data?.name}</Text>
+            <Text>{model?.name}</Text>
+          </Flex>
         </Card.Section>
 
         <Card.Section>
           <Center my={20}>
-            <Button variant="outline" color="violet" size="xs">
+            <Button variant="outline" color="violet" size="xs" onClick={open}>
               Edit
             </Button>
           </Center>
