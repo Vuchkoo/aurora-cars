@@ -3,6 +3,7 @@ import { supabase } from "@/common/config/Supabase";
 import Header from "@/components/Header";
 import VehicleCard from "@/components/VehicleCard";
 import CreateVehicle from "@/components/forms/CreateVehicle";
+import EditVehicle from "@/components/forms/EditVehicle";
 import {
   ActionIcon,
   Button,
@@ -27,9 +28,15 @@ import {
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [opened, { open, close }] = useDisclosure(false);
-  const [activePage, setPage] = useState(1);
+  const [
+    openedCreateModal,
+    { open: openCreateModal, close: closeCreateModal },
+  ] = useDisclosure(false);
 
+  const [openedEditModal, { open: openEditModal, close: closeEditModal }] =
+    useDisclosure(false);
+
+  const [activePage, setPage] = useState(1);
   const [vehicleMake, setVehicleMake] = useState([]);
   const [vehicleModel, setVehicleModel] = useState([]);
 
@@ -40,6 +47,8 @@ export default function Home() {
   const [minLoad, setMinLoad] = useState(0);
   const [maxLoad, setMaxLoad] = useState(9);
   const [vehicleCount, setVehicleCount] = useState(null);
+
+  const [editingVehicle, setEditingVehicle] = useState([]);
 
   const getVehicleMake = async () => {
     setLoading(true);
@@ -73,9 +82,9 @@ export default function Home() {
 
   const removeVehicle = async (index, id) => {
     setLoading(true);
-    const { data } = await supabase.from("vehicle_make").delete().eq("id", id);
-    if (data) {
-      console.log(index, id);
+    const { error } = await supabase.from("vehicle_make").delete().eq("id", id);
+    if (error) {
+      console.log("Error");
     }
     setLoading(false);
   };
@@ -94,7 +103,7 @@ export default function Home() {
 
   const vehicles = vehicleMake?.map((item, index) => {
     const model = vehicleModel[index];
-    console.log(model);
+    // console.log(model);
     if (iconGrid)
       return (
         <VehicleCard
@@ -103,6 +112,7 @@ export default function Home() {
           key={index}
           index={index}
           removeVehicle={removeVehicle}
+          open={openEditModal}
         />
       );
     else
@@ -119,17 +129,16 @@ export default function Home() {
           </td>
 
           <td width="100%">
-            <Center>
-              <Text fw={500}>
-                {item.name} <span>{model.name}</span>
-              </Text>
-            </Center>
+            <Flex direction="column">
+              <Text fw={500}>{item.name}</Text>
+              <Text>{model.name}</Text>
+            </Flex>
           </td>
 
           <td>
             <Flex>
               <ActionIcon color="violet" variant="light">
-                <IconPencil />
+                <IconPencil onClick={openEditModal} />
               </ActionIcon>
               <ActionIcon
                 color="violet"
@@ -148,14 +157,26 @@ export default function Home() {
       <Header />
 
       <Flex justify="center" align="center" direction="column" my={20}>
-        <Button color="violet" onClick={open}>
+        <Button color="violet" onClick={openCreateModal}>
           Create a new vehicle
         </Button>
         <Divider my={20} w={400} />
       </Flex>
 
-      <Modal opened={opened} onClose={close} title="Vehicle Creation">
-        <CreateVehicle close={close} />
+      <Modal
+        opened={openedCreateModal}
+        onClose={closeCreateModal}
+        title="Vehicle Creation"
+      >
+        <CreateVehicle close={closeCreateModal} />
+      </Modal>
+
+      <Modal
+        opened={openedEditModal}
+        onClose={closeEditModal}
+        title="Edit Vehicle"
+      >
+        <EditVehicle vehicleMake={vehicleMake} vehicleModel={vehicleModel} />
       </Modal>
 
       <Flex ml={20}>
@@ -197,7 +218,7 @@ export default function Home() {
         </Table>
       )}
 
-      <Flex justify="center" align="center" direction="column">
+      <Flex justify="center" align="center" direction="column" mb={50}>
         <Divider my={20} w={400} />
         <Pagination
           value={activePage}
