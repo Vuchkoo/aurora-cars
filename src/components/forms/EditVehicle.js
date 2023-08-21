@@ -3,33 +3,68 @@ import { Button, Group, Stepper, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React, { useEffect, useState } from "react";
 
-export default function EditVehicle({ vehicleMake, vehicleModel }) {
+export default function EditVehicle({ opened, close, editingVehicleId }) {
   const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const vehicleMakeForm = useForm({
+  const [editingVehicleMake, setEditingVehicleMake] = useState([]);
+  const [editingVehicleModel, setEditingVehicleModel] = useState([]);
+
+  const editingVehicleMakeForm = useForm({
     initialValues: {
-      id: vehicleMake,
       name: "",
       abbrv: "",
     },
   });
 
-  const vehicleModelForm = useForm({
+  const editingVehicleModelForm = useForm({
     initialValues: {
-      make_id: vehicleMakeForm.values.id,
       name: "",
       abbrv: "",
     },
   });
+
+  const getEditingVehicleMake = async () => {
+    if (opened) {
+      setLoading(true);
+      const { data } = await supabase
+        .from("vehicle_make")
+        .select()
+        .eq("id", editingVehicleId)
+        .single();
+      if (data) {
+        setEditingVehicleMake(data);
+      } else console.log("Error");
+      setLoading(false);
+    } else setEditingVehicleMake([]);
+  };
+
+  const getEditingVehicleModel = async () => {
+    if (opened) {
+      setLoading(true);
+      const { data } = await supabase
+        .from("vehicle_model")
+        .select()
+        .eq("make_id", editingVehicleId)
+        .single();
+      if (data) {
+        setEditingVehicleModel(data);
+      } else console.log("Error");
+      setLoading(false);
+    } else setEditingVehicleModel([]);
+  };
+
+  useEffect(() => {
+    getEditingVehicleMake();
+    getEditingVehicleModel();
+  }, []);
 
   const nextEditStep = async () => {
     if (activeStep === 0) {
       const { data, error } = await supabase
         .from("vehicle_make")
-        .update({ ...vehicleMakeForm.values })
-        .eq("id", vehicleMake.id)
-        .select();
-      vehicleModelForm.setFieldValue("make_id", data.id);
+        .update({ ...editingVehicleMakeForm.values })
+        .eq("id", editingVehicleId);
       if (error) {
         console.log("Error");
       } else console.log(data);
@@ -40,16 +75,11 @@ export default function EditVehicle({ vehicleMake, vehicleModel }) {
   const editVehicleModel = async (index, id) => {
     const { data } = await supabase
       .from("vehicle_model")
-      .update(...vehicleModelForm)
-      .eq("id", vehicleModelForm.id)
-      .select();
+      .update({ ...editingVehicleModelForm.values })
+      .eq("make_id", editingVehicleId);
     if (data) console.log(index, id);
     else console.log("Error");
   };
-
-  console.log(vehicleMake);
-  // console.log(vehicleMakeForm.values);
-  // console.log(vehicleModelForm.values);
 
   return (
     <>
@@ -69,16 +99,17 @@ export default function EditVehicle({ vehicleMake, vehicleModel }) {
             <TextInput
               mt="md"
               label="Name"
-              placeholder="e.g. Volkswagen"
+              placeholder={editingVehicleMake.name}
+              required
               withAsterisk
-              {...vehicleMakeForm.getInputProps("name")}
+              {...editingVehicleMakeForm.getInputProps("name")}
             />
 
             <TextInput
               mt="md"
               label="Abbrv"
-              placeholder="e.g. VW"
-              {...vehicleMakeForm.getInputProps("abbrv")}
+              placeholder={editingVehicleMake.abbrv}
+              {...editingVehicleMakeForm.getInputProps("abbrv")}
             />
           </>
         ) : (
@@ -87,16 +118,17 @@ export default function EditVehicle({ vehicleMake, vehicleModel }) {
               <TextInput
                 mt="md"
                 label="Model"
-                placeholder="e.g. Golf"
+                placeholder={editingVehicleModel.name}
+                required
                 withAsterisk
-                {...vehicleModelForm.getInputProps("name")}
+                {...editingVehicleModelForm.getInputProps("name")}
               />
 
               <TextInput
                 mt="md"
                 label="Abbrv"
-                placeholder="e.g. GTI"
-                {...vehicleModelForm.getInputProps("abbrv")}
+                placeholder={editingVehicleModel.abbrv}
+                {...editingVehicleModelForm.getInputProps("abbrv")}
               />
             </>
           )

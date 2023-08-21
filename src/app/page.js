@@ -48,7 +48,7 @@ export default function Home() {
   const [maxLoad, setMaxLoad] = useState(9);
   const [vehicleCount, setVehicleCount] = useState(null);
 
-  const [editingVehicle, setEditingVehicle] = useState([]);
+  const [editingVehicleId, setEditingVehicleId] = useState("");
 
   const getVehicleMake = async () => {
     setLoading(true);
@@ -103,7 +103,6 @@ export default function Home() {
 
   const vehicles = vehicleMake?.map((item, index) => {
     const model = vehicleModel[index];
-    // console.log(model);
     if (iconGrid)
       return (
         <VehicleCard
@@ -113,6 +112,7 @@ export default function Home() {
           index={index}
           removeVehicle={removeVehicle}
           open={openEditModal}
+          setEditingVehicleId={setEditingVehicleId}
         />
       );
     else
@@ -138,7 +138,12 @@ export default function Home() {
           <td>
             <Flex>
               <ActionIcon color="violet" variant="light">
-                <IconPencil onClick={openEditModal} />
+                <IconPencil
+                  onClick={() => {
+                    openEditModal();
+                    setEditingVehicleId(item.id);
+                  }}
+                />
               </ActionIcon>
               <ActionIcon
                 color="violet"
@@ -176,7 +181,11 @@ export default function Home() {
         onClose={closeEditModal}
         title="Edit Vehicle"
       >
-        <EditVehicle vehicleMake={vehicleMake} vehicleModel={vehicleModel} />
+        <EditVehicle
+          editingVehicleId={editingVehicleId}
+          opened={openedEditModal}
+          close={closeEditModal}
+        />
       </Modal>
 
       <Flex ml={20}>
