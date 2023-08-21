@@ -1,6 +1,6 @@
 "use client";
 import { supabase } from "@/common/config/Supabase";
-import Header from "@/components/Header";
+import Header from "@/layouts/Header";
 import VehicleCard from "@/components/VehicleCard";
 import CreateVehicle from "@/components/forms/CreateVehicle";
 import EditVehicle from "@/components/forms/EditVehicle";

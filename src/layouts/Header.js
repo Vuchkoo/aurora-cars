@@ -1,23 +1,42 @@
 import React, { useState } from "react";
-import Logo from "./Logo";
+import Logo from "../components/Logo";
 import { Anchor, Button, Divider, Flex, Group, Modal } from "@mantine/core";
-import SignIn from "./forms/SignIn";
-import SignUp from "./forms/SignUp";
+import SignIn from "../components/forms/SignIn";
+import SignUp from "../components/forms/SignUp";
+import { useRouter } from "next/navigation";
 
-const Header = () => {
+const Header = ({ children }) => {
   const [signInOpened, setSignInOpened] = useState(false);
   const [signUpOpened, setSignUpOpened] = useState(false);
+
+  const router = useRouter();
+
   return (
     <header>
       <Flex align="center" justify="space-between" mx={20} my={5}>
-        <Group>
+        <Group
+          sx={{ "&:hover": { cursor: "pointer" } }}
+          onClick={() => router.push("/")}
+        >
           <Logo />
         </Group>
-        <Group>
-          <Anchor underline={false} color="dark">
+        <Group ml={40}>
+          <Anchor
+            underline={false}
+            color="dark"
+            onClick={() => router.push("/about")}
+            weight={500}
+            sx={{ "&:hover": { fontWeight: "700", color: "purple" } }}
+          >
             About
           </Anchor>
-          <Anchor underline={false} color="dark">
+          <Anchor
+            underline={false}
+            color="dark"
+            onClick={() => router.push("/")}
+            weight={500}
+            sx={{ "&:hover": { fontWeight: "700", color: "purple" } }}
+          >
             Cars
           </Anchor>
         </Group>
@@ -34,7 +53,13 @@ const Header = () => {
           </Button>
         </Group>
       </Flex>
-      <Divider color="violet" />
+
+      <Divider
+        color="violet"
+        size={5}
+        sx={{ boxShadow: "0px 3px 5px black" }}
+      />
+
       <Modal
         opened={signInOpened}
         onClose={() => setSignInOpened(false)}
@@ -43,6 +68,7 @@ const Header = () => {
       >
         <SignIn />
       </Modal>
+
       <Modal
         opened={signUpOpened}
         onClose={() => setSignUpOpened(false)}
@@ -51,6 +77,7 @@ const Header = () => {
       >
         <SignUp />
       </Modal>
+      {children}
     </header>
   );
 };
