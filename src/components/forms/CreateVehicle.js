@@ -1,13 +1,5 @@
 import { supabase } from "@/common/config/Supabase";
-import {
-  Button,
-  Center,
-  Flex,
-  Group,
-  SimpleGrid,
-  Stepper,
-  TextInput,
-} from "@mantine/core";
+import { Button, Group, Stepper, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React, { useState } from "react";
 
@@ -56,9 +48,6 @@ function CreateVehicle({ close }) {
     } else console.log(data);
   };
 
-  console.log(vehicleMakeForm.values);
-  console.log(vehicleModelForm.values);
-
   return (
     <>
       <Stepper
@@ -95,7 +84,7 @@ function CreateVehicle({ close }) {
               <TextInput
                 mt="md"
                 label="Model"
-                placeholder="e.g. Golf"
+                placeholder="e.g. Golf 8 GTI"
                 withAsterisk
                 {...vehicleModelForm.getInputProps("name")}
               />
